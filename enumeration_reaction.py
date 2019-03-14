@@ -53,15 +53,7 @@ def enumeration_cgr(reaction, all_prot, all_coming ):
 
     cgrs = ~reaction
 
-    pp = cgrs.center_atoms
 
-    # all_prot = diff_atoms(reaction.reactants, reaction.products)
-    # all_coming = diff_atoms(reaction.products, reaction.reactants)
-    # all_cycl = []
-    # for x in reaction.reagents:
-    #     all_cycl.extend(x.sssr)
-    # for x in reaction.products:
-    #     all_cycl.extend(x.sssr)
     prot_gr = cgrs.substructure(all_prot).split()
     coming_gr = cgrs.substructure(all_coming).split()
 

@@ -9,9 +9,7 @@ from CGRtools.preparer import CGRpreparer
 def cycl(new_reaction):
 
     new_reaction.reset_query_marks()
-    cycles = []
-    # prot = set(new_reaction.reagents).difference(new_reaction.products)
-    # coming = set(new_reaction.products).difference(new_reaction.reagents)
+
 
     new_cgr = ~new_reaction
     new_cgr.reset_query_marks()
@@ -26,13 +24,6 @@ def cycl(new_reaction):
             if y not in cycles:
                 cycles.extend(y)
 
-    # try:
-    #     cycles = new_cgr.sssr
-    # except:
-    #     'No path between 1 and 29'
-    # if not cycles:                                             #  для проверки возникшей ошибки с отсутствующим циклом
-    #     with SDFwrite('/home/ravil/Desktop/Toster_peka.sdf',extralabels = True) as peka:
-    #         peka.write(new_cgr)
     multiple_b_at = []
     center_new_cgr = set(new_cgr.center_atoms)
     hetero_atoms=[]
@@ -56,9 +47,6 @@ def cycl(new_reaction):
                     if all(new_cgr.nodes[x].hybridization == 4 for x in set_cyc) or all(new_cgr.nodes[x].p_hybridization == 4 for x in set_cyc):    # hybridiztion
                         usefull_cycles.extend(set_cyc)
 
-                # for x in new_cgr.subgraph(set_cyc).edges():
-                #     if new_cgr.subgraph(set_cyc).edges[x].order == None:
-                #         pp = 1
                 if any(new_cgr.subgraph(set_cyc).edges[x].order == None for x in new_cgr.subgraph(set_cyc).edges()):  # если замыкание цикла, если нет то цикл не интересен
 
                     if len(set(set_cyc).intersection(center_new_cgr)) > 2:  # нахождение динамических циклов

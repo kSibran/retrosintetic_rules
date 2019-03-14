@@ -26,8 +26,7 @@ def constructor(center_atoms, new_reaction, fg_fg, all_prot, all_coming, n):
     for mol in new_reaction.products:
         all_pr._node.update(mol._node)
         all_pr._adj.update(mol._adj)
-    #fg = new_cgr.substructure(center_atoms)
-   # fg_center = fg.substructure(set(fg).difference(prot).difference(coming))
+
     for_dell_re = set(all_re).difference(center_atoms)
     for_dell_pr =set(all_pr).difference(center_atoms)
     [all_re.delete_atom(x) for x in for_dell_re]

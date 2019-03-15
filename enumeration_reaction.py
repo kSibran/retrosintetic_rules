@@ -84,7 +84,7 @@ def enumeration_cgr(reaction, all_prot, all_coming ):
     for x in reaction.products:
         for y in x.sssr:
             if y not in cycles:
-                cycles.extend(y)
+                cycles.append(y)
 
     for y in cycles:
         kk=cgrs.substructure(y)

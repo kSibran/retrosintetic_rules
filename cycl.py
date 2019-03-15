@@ -20,7 +20,7 @@ def cycl(new_reaction):
     for x in new_reaction.products:
         for y in x.sssr:
             if y not in cycles:
-                cycles.extend(y)
+                cycles.append(y)
 
     multiple_b_at = []
     center_new_cgr = set(new_cgr.center_atoms)

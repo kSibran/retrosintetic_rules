@@ -19,19 +19,15 @@ def diff_atoms(mols_1, mols_2):
             set_2.add(at)
     return set_1.difference(set_2)
 
-with  open('/home/ravil/reaxys.0001.pickle' , 'rb') as data, \
+with  open('/home/ravil/reaxys.0000.pickle' , 'rb') as data,\
     RDFwrite('/home/ravil/Desktop/gg.rdf', 'w') as ffffffff,\
-    RDFwrite('/home/ravil/Desktop/Error.rdf') as err:
+    RDFwrite('/home/ravil/Desktop/Error.rdf') as err: #'/home/ravil/Desktop/query_graphs_and_other/base/db_task/readliner_out/diol.rdf'
 
     reaction_file = pickle.load(data)
     fg_fg = {}
     for n, reaction in enumerate(reaction_file, start = 1):
-        if n < 48:
-            continue
-        if n > 48:
-            break
-
         print(n)
+        reac = (reaction.reactants,reaction.products)
         all_prot = diff_atoms(reaction.reactants, reaction.products)
         all_coming = diff_atoms(reaction.products, reaction.reactants)
 

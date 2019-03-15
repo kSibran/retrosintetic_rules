@@ -60,12 +60,12 @@ def enumeration_cgr(reaction, all_prot, all_coming ):
     prot_list = [set(x) for x in prot_gr]
     coming_list = [set(x) for x in coming_gr]
 
-    all = []
-    all.extend(prot_list)
-    all.extend(coming_list)
+    all_prot_come = []
+    all_prot_come.extend(prot_list)
+    all_prot_come.extend(coming_list)
     other_list = cgrs.centers_list
 
-    for x in all:
+    for x in all_prot_come:
         index_list = []
         for i, y in enumerate(other_list):
             if x.intersection(y):
@@ -85,38 +85,42 @@ def enumeration_cgr(reaction, all_prot, all_coming ):
         for y in x.sssr:
             if y not in cycles:
                 cycles.extend(y)
-    #for y in cgrs.split():
-       # for kk in y.sssr:
-    for y in cycles:
 
-        for kk in cgrs.substructure(y):
-            ept = []
-            new_ind = []
-            un_in_cy = []
+    for y in cycles:
+        kk=cgrs.substructure(y)
+        ept = []
+        new_ind = []
+        unite = []
+
+        if all(cgrs.bond(*z).order == 4 for z in kk.edges) and any(cgrs.bond(*z).p_order != 4 for z in kk.edges)\
+                or all(cgrs.bond(*z).p_order == 4 for z in kk.edges) and any(cgrs.bond(*z).order != 4 for z in kk.edges):
+            unite.extend(y)
+        else:
             for x in other_list:
                 if set(x).intersection(kk)  and len(set(x).intersection(kk))>1:
                     ept.append(set(x).intersection(kk))
 
             if len(ept) >= 2:
-                hei = y.substructure(kk)
                 for x in ept:
                     for i, p in enumerate(x):
                         for i2, m in enumerate(x):
                             if i!=i2:
-                                if hei.has_edge(m,p) and (hei.bond(m,p).order == None or hei.bond(m,p).p_order == None):
-                                    un_in_cy.extend([m,p])
+                                if kk.has_edge(m,p) and (kk.bond(m,p).order == None or kk.bond(m,p).p_order == None):
+                                    unite.extend([m,p])
 
-            if un_in_cy:
-                for i3, zop in enumerate(other_list):
-                    if set(zop).intersection(un_in_cy):
-                        new_ind.append(i3)
-            if len(new_ind)>1:
-                y = []
-                new_ind.reverse()
-                for x in new_ind:
-                    y.extend(other_list[x])
-                    other_list.pop(x)
-                other_list.append(y)
+        if unite:
+            for i3, zop in enumerate(other_list):
+                if set(zop).intersection(unite):
+                    new_ind.append(i3)
+        if len(new_ind)>1:
+            y = []
+            new_ind.reverse()
+            for x in new_ind:
+                y.extend(other_list[x])
+                other_list.pop(x)
+            other_list.append(y)
+
+
 
     if 1 < len(other_list):
 

@@ -13,8 +13,6 @@ def cycl(new_reaction):
 
     new_cgr = ~new_reaction
     new_cgr.reset_query_marks()
-    # prot_gr = new_cgr.substructure(prot).split()
-    # coming_gr = new_cgr.substructure(coming).split()
 
     cycles = []
     for x in new_reaction.reactants:

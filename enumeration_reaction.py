@@ -1,10 +1,7 @@
-from CGRtools.files import RDFread, RDFwrite, MRVread
-from CGRtools.algorithms import sssr
 from collections import defaultdict
-import copy
 from itertools import product
-from CGRtools.containers import ReactionContainer, MoleculeContainer, CGRContainer
-from CGRtools.preparer import CGRpreparer
+from CGRtools.containers import ReactionContainer, MoleculeContainer
+
 
 
 def big_mol(mols):
@@ -24,16 +21,16 @@ def prot_come(rc, prot_or_come, gr):
 
 def atom_re_pr(set_atom, mol_source_re, mol_source_pr):
     out = defaultdict(dict)
-    for x in set_atom:
-        if x in mol_source_re.atoms_numbers:
-            re = mol_source_re.atom(x)
+    for atom in set_atom:
+        if atom in mol_source_re.atoms_numbers:
+            re = mol_source_re.atom(atom).copy() #.copy  нужна для того чтобы при изменении меток гибридизации и меток соседних атомов, не изменялись те же самые метки в других реакциях( но возможно это бесполезно так как метки удаляються совсем в другом месте)
         else:
             re = None
-        if x in mol_source_pr.atoms_numbers:
-            pr = mol_source_pr.atom(x)
+        if atom in mol_source_pr.atoms_numbers:
+            pr = mol_source_pr.atom(atom).copy()
         else:
             pr = None
-        out[x] ={'re':re, 'pr' : pr}
+        out[atom] ={'re':re, 'pr' : pr}
     return out
 
 def bonds_re_pr(bonds, atoms):
@@ -64,7 +61,7 @@ def enumeration_cgr(reaction, all_prot, all_coming ):
     all_prot_come.extend(prot_list)
     all_prot_come.extend(coming_list)
     other_list = cgrs.centers_list
-
+# компоновка уходящих приходящих групп ко всем реакционным центрам
     for x in all_prot_come:
         index_list = []
         for i, y in enumerate(other_list):
@@ -77,7 +74,7 @@ def enumeration_cgr(reaction, all_prot, all_coming ):
             for i in index_list:
                 uu.extend(other_list.pop(i))
             other_list.append(uu)
-
+# конец компоновки
     cycles = []
     for x in reaction.reactants:
         cycles.extend(x.sssr)
@@ -85,7 +82,7 @@ def enumeration_cgr(reaction, all_prot, all_coming ):
         for y in x.sssr:
             if y not in cycles:
                 cycles.append(y)
-
+# объединение реакционных центров при циклизации в общий для этих рц цикл
     for y in cycles:
         kk=cgrs.substructure(y)
         ept = []
@@ -97,7 +94,8 @@ def enumeration_cgr(reaction, all_prot, all_coming ):
             unite.extend(y)
         else:
             for x in other_list:
-                if set(x).intersection(kk)  and len(set(x).intersection(kk))>1:
+                #if set(x).intersection(kk)  and len(set(x).intersection(kk))>1:
+                if len(set(x).intersection(kk))>1:
                     ept.append(set(x).intersection(kk))
 
             if len(ept) >= 2:
@@ -119,7 +117,7 @@ def enumeration_cgr(reaction, all_prot, all_coming ):
                 y.extend(other_list[x])
                 other_list.pop(x)
             other_list.append(y)
-
+#конец объединения
 
 
     if 1 < len(other_list):
@@ -146,16 +144,20 @@ def enumeration_cgr(reaction, all_prot, all_coming ):
 
             list_rc.append([atom_t, prot_atoms, comming_atoms, t_bond, prot_bonds, comming_bonds])
 
-        for e , t_rc in enumerate(list_rc):
+        for e, t_rc in enumerate(list_rc):
             for state in list(product([1, 0], repeat=len(list_rc) - 1)):
 
+                # new_reactant = MoleculeContainer()
+                # new_product = MoleculeContainer()
                 new_reactant = MoleculeContainer()
                 new_product = MoleculeContainer()
                 new_all_bonds_reactants = []
                 new_all_bonds_products =[]
 
-                new_reactant = add_at(const_at,reactants_to_work, new_reactant)
-                new_product = add_at(const_at,product_to_work, new_product)
+                # new_reactant = add_at(const_at,reactants_to_work, new_reactant)
+                # new_product = add_at(const_at,product_to_work, new_product)
+                add_at(const_at, reactants_to_work, new_reactant)
+                add_at(const_at, product_to_work, new_product)
 
                 for x, y in t_rc[0].items():
                     new_reactant.add_atom(y['re'], x)
@@ -223,6 +225,9 @@ def enumeration_cgr(reaction, all_prot, all_coming ):
 
                 [new_reactant.add_bond(*x) for x in new_all_bonds_reactants if not new_reactant.has_edge(x[0], x[1])]
                 [new_product.add_bond(*x) for x in new_all_bonds_products if not new_product.has_edge(x[0], x[1])]
-                variants_reaction.append(ReactionContainer(reactants = (new_reactant,), products =(new_product,)))
+
+                new_reaction = ReactionContainer(reactants = (new_reactant,), products =(new_product,))
+                new_reaction.meta.update(reaction.meta)
+                variants_reaction.append(new_reaction)
         return variants_reaction
     return [reaction]

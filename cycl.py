@@ -1,15 +1,6 @@
-from CGRtools.files import RDFread, RDFwrite, MRVread
-from CGRtools.algorithms import sssr
-from collections import defaultdict
-import copy
-from itertools import product
-from CGRtools.containers import ReactionContainer, MoleculeContainer, CGRContainer
-from CGRtools.preparer import CGRpreparer
-
 def cycl(new_reaction):
 
     new_reaction.reset_query_marks()
-
 
     new_cgr = ~new_reaction
     new_cgr.reset_query_marks()

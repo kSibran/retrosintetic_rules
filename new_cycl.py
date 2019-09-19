@@ -1,10 +1,7 @@
-from collections import defaultdict
+from CGRtools.containers import  CGRContainer
 def cycl(new_reaction):
 
-   # new_reaction.reset_query_marks()
-
     new_cgr = ~new_reaction
-    #new_cgr.reset_query_marks()
 
     cycles = []
     for x in new_reaction.reactants:
@@ -16,15 +13,14 @@ def cycl(new_reaction):
 
     multiple_b_at = []
     hetero_atoms=[]
+
     center_new_cgr = set(new_cgr.center_atoms)
 
     if center_new_cgr:
-
         for x in center_new_cgr:
             for y in list(new_cgr.bonds()):
                 if x == y[0]:
-                    if new_cgr.atom(y[1]).atomic_symbol != 'C' and new_cgr.atom(y[1]).atomic_symbol != 'H' and y[
-                        1] not in center_new_cgr:
+                    if new_cgr.atom(y[1]).atomic_symbol != 'C' and new_cgr.atom(y[1]).atomic_symbol != 'H' and y[1] not in center_new_cgr:
                         hetero_atoms.append(y[1])
 
         if cycles:
@@ -58,15 +54,14 @@ def cycl(new_reaction):
             elif non_dinamic_cyc:
                 usefull_cycles.extend(non_dinamic_cyc)
 
+            center_new_cgr.update(set(new_cgr.augmented_substructure(center_new_cgr, deep=1)).difference(center_new_cgr))
             center_new_cgr.update(usefull_cycles)
 
         for atom in set(center_new_cgr):
             for x in list(new_cgr.bonds()):
                 if x[0] == atom and x[1] not in center_new_cgr and (x[2].order and x[2].order > 1 or x[2].p_order and x[2].p_order > 1):
                     multiple_b_at.append(x[1])
-            # for x in new_cgr.environment(atom):
-            #     if x[0].order and x[0].order > 1 or x[0].p_order and x[0].p_order > 1:
-            #         multiple_b_at.append(x[1].map)
+
         center_new_cgr.update(multiple_b_at)
 
         center_new_cgr.update(hetero_atoms)
